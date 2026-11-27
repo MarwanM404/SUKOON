@@ -109,6 +109,18 @@ class TestSukoon(TransactionCase):
             self.assertEqual(res.state, 'completed')
             self.assertEqual(cancelled.state, 'cancelled', 'Cancelled bookings never move')
 
+    @freeze_time('2026-06-10')
+    def test_default_order_by_status(self):
+        cancelled = self._res(date(2026, 6, 20), date(2026, 6, 22), prop=self.other_prop)
+        cancelled.action_cancel()
+        completed = self._res(date(2026, 6, 1), date(2026, 6, 3))
+        upcoming = self._res(date(2026, 6, 20), date(2026, 6, 22))
+        in_stay = self._res(date(2026, 6, 9), date(2026, 6, 12))
+        found = self.env['sukoon.reservation'].search(
+            [('id', 'in', (cancelled | completed | upcoming | in_stay).ids)])
+        self.assertEqual(found.mapped('state'),
+                         ['upcoming', 'in_stay', 'completed', 'cancelled'])
+
     def test_cancel_and_reopen(self):
         with freeze_time('2026-06-10'):
             res = self._res(date(2026, 6, 9), date(2026, 6, 12))

@@ -10,7 +10,7 @@ class SukoonReservation(models.Model):
     _name = 'sukoon.reservation'
     _description = 'Reservation'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-    _order = 'check_in desc, id desc'
+    _order = 'state_sequence, check_in desc, id desc'
     _rec_names_search = ['name', 'guest_name']
 
     name = fields.Char(
@@ -46,6 +46,8 @@ class SukoonReservation(models.Model):
         help="Follows the dates: Upcoming before check-in, In stay from the "
              "check-in day, Completed from the check-out day. Only Cancelled "
              "is set by hand.")
+    state_sequence = fields.Integer(
+        compute='_compute_state_sequence', store=True, index=True)
     notes = fields.Text()
 
     # ------------------------------------------------------------------
@@ -69,6 +71,12 @@ class SukoonReservation(models.Model):
         for res in self:
             res.state = ('cancelled' if res.state == 'cancelled'
                          else res._state_for_dates(today))
+
+    @api.depends('state')
+    def _compute_state_sequence(self):
+        order = [value for value, _label in self._fields['state'].selection]
+        for res in self:
+            res.state_sequence = order.index(res.state) if res.state in order else len(order)
 
     @api.depends('guest_name', 'name')
     def _compute_display_name(self):
