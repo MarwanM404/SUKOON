@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sukoon_property_list" model="ir.ui.view">
+        <field name="name">sukoon.property.list</field>
+        <field name="model">sukoon.property</field>
+        <field name="arch" type="xml">
+            <list string="Properties">
+                <field name="name"/>
+                <field name="address" optional="show"/>
+                <field name="owner_id"/>
+                <field name="bedrooms" string="Beds"/>
+                <field name="bathrooms" string="Baths"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="nightly_rate"/>
+                <field name="commission_pct" string="Commission %"/>
+                <field name="active" column_invisible="True"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sukoon_property_form" model="ir.ui.view">
+        <field name="name">sukoon.property.form</field>
+        <field name="model">sukoon.property</field>
+        <field name="arch" type="xml">
+            <form string="Property">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_reservations" type="object"
+                                class="oe_stat_button" icon="fa-calendar">
+                            <field name="reservation_count" widget="statinfo" string="Reservations"/>
+                        </button>
+                        <button name="action_view_open_tasks" type="object"
+                                class="oe_stat_button" icon="fa-check-square-o">
+                            <field name="open_task_count" widget="statinfo" string="Open Tasks"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Inactive" bg_color="text-bg-secondary"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="e.g. Sunset Villa"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="owner_id" context="{'default_is_property_owner': True}"/>
+                            <field name="address" placeholder="12 Ocean Ave, Tampa FL"/>
+                            <field name="bedrooms"/>
+                            <field name="bathrooms"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="nightly_rate"/>
+                            <field name="commission_pct"/>
+                            <field name="active" widget="boolean_toggle"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Access codes, parking, house rules..."/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sukoon_property_search" model="ir.ui.view">
+        <field name="name">sukoon.property.search</field>
+        <field name="model">sukoon.property</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="owner_id"/>
+                <field name="address"/>
+                <filter name="inactive" string="Inactive" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter name="group_owner" string="Owner" context="{'group_by': 'owner_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sukoon_property" model="ir.actions.act_window">
+        <field name="name">Properties</field>
+        <field name="res_model">sukoon.property</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No properties yet</p>
+            <p>Add the first unit you manage to get started.</p>
+        </field>
+    </record>
+</odoo>

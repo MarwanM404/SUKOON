@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Owners -->
+    <record id="demo_owner_dana" model="res.partner">
+        <field name="name">Dana Whitfield</field>
+        <field name="email">dana@example.com</field>
+        <field name="phone">(555) 010-1234</field>
+        <field name="is_property_owner" eval="True"/>
+        <field name="payout_notes">Bank transfer, monthly on the 5th.</field>
+    </record>
+    <record id="demo_owner_omar" model="res.partner">
+        <field name="name">Omar Haddad</field>
+        <field name="email">omar@example.com</field>
+        <field name="phone">(555) 010-5678</field>
+        <field name="is_property_owner" eval="True"/>
+        <field name="payout_notes">Wire transfer at month end; send statement by email first.</field>
+    </record>
+
+    <!-- Properties -->
+    <record id="demo_prop_sunset" model="sukoon.property">
+        <field name="name">Sunset Villa</field>
+        <field name="address">12 Ocean Ave, Tampa FL</field>
+        <field name="owner_id" ref="demo_owner_dana"/>
+        <field name="bedrooms">3</field>
+        <field name="bathrooms">2</field>
+        <field name="nightly_rate">250</field>
+        <field name="commission_pct">20</field>
+    </record>
+    <record id="demo_prop_harbor" model="sukoon.property">
+        <field name="name">Harbor Loft</field>
+        <field name="address">88 Dock St, Unit 4B, Tampa FL</field>
+        <field name="owner_id" ref="demo_owner_dana"/>
+        <field name="bedrooms">1</field>
+        <field name="bathrooms">1</field>
+        <field name="nightly_rate">140</field>
+        <field name="commission_pct">18</field>
+    </record>
+    <record id="demo_prop_palm" model="sukoon.property">
+        <field name="name">Palm Cottage</field>
+        <field name="address">5 Palm Ln, Clearwater FL</field>
+        <field name="owner_id" ref="demo_owner_omar"/>
+        <field name="bedrooms">2</field>
+        <field name="bathrooms">1</field>
+        <field name="nightly_rate">180</field>
+        <field name="commission_pct">22</field>
+    </record>
+
+    <!-- Reservations (dates relative to the install day) -->
+    <record id="demo_res_sunset_past" model="sukoon.reservation">
+        <field name="property_id" ref="demo_prop_sunset"/>
+        <field name="guest_name">Priya Nair</field>
+        <field name="check_in" eval="(DateTime.today() - relativedelta(days=12)).strftime('%Y-%m-%d')"/>
+        <field name="check_out" eval="(DateTime.today() - relativedelta(days=8)).strftime('%Y-%m-%d')"/>
+        <field name="total_amount">1000</field>
+        <field name="state">completed</field>
+    </record>
+    <record id="demo_res_sunset_now" model="sukoon.reservation">
+        <field name="property_id" ref="demo_prop_sunset"/>
+        <field name="guest_name">Alex Rivera</field>
+        <field name="check_in" eval="(DateTime.today() - relativedelta(days=2)).strftime('%Y-%m-%d')"/>
+        <field name="check_out" eval="(DateTime.today() + relativedelta(days=3)).strftime('%Y-%m-%d')"/>
+        <field name="total_amount">1250</field>
+        <field name="state">in_stay</field>
+        <field name="notes">Late check-in, needs a crib.</field>
+    </record>
+    <record id="demo_res_sunset_next" model="sukoon.reservation">
+        <field name="property_id" ref="demo_prop_sunset"/>
+        <field name="guest_name">The Okafor family</field>
+        <field name="check_in" eval="(DateTime.today() + relativedelta(days=5)).strftime('%Y-%m-%d')"/>
+        <field name="check_out" eval="(DateTime.today() + relativedelta(days=9)).strftime('%Y-%m-%d')"/>
+        <field name="total_amount">1000</field>
+    </record>
+    <record id="demo_res_harbor_past" model="sukoon.reservation">
+        <field name="property_id" ref="demo_prop_harbor"/>
+        <field name="guest_name">Lena Fischer</field>
+        <field name="check_in" eval="(DateTime.today() - relativedelta(days=6)).strftime('%Y-%m-%d')"/>
+        <field name="check_out" eval="(DateTime.today() - relativedelta(days=3)).strftime('%Y-%m-%d')"/>
+        <field name="total_amount">420</field>
+        <field name="state">completed</field>
+    </record>
+    <record id="demo_res_harbor_next" model="sukoon.reservation">
+        <field name="property_id" ref="demo_prop_harbor"/>
+        <field name="guest_name">Marco Bianchi</field>
+        <field name="check_in" eval="(DateTime.today() + relativedelta(days=1)).strftime('%Y-%m-%d')"/>
+        <field name="check_out" eval="(DateTime.today() + relativedelta(days=4)).strftime('%Y-%m-%d')"/>
+        <field name="total_amount">420</field>
+    </record>
+    <record id="demo_res_harbor_cancelled" model="sukoon.reservation">
+        <field name="property_id" ref="demo_prop_harbor"/>
+        <field name="guest_name">Sam Lee</field>
+        <field name="check_in" eval="(DateTime.today() + relativedelta(days=10)).strftime('%Y-%m-%d')"/>
+        <field name="check_out" eval="(DateTime.today() + relativedelta(days=12)).strftime('%Y-%m-%d')"/>
+        <field name="total_amount">280</field>
+        <field name="state">cancelled</field>
+    </record>
+    <record id="demo_res_palm_now" model="sukoon.reservation">
+        <field name="property_id" ref="demo_prop_palm"/>
+        <field name="guest_name">Hana Sato</field>
+        <field name="check_in" eval="(DateTime.today() - relativedelta(days=1)).strftime('%Y-%m-%d')"/>
+        <field name="check_out" eval="(DateTime.today() + relativedelta(days=2)).strftime('%Y-%m-%d')"/>
+        <field name="total_amount">540</field>
+        <field name="state">in_stay</field>
+    </record>
+    <record id="demo_res_palm_next" model="sukoon.reservation">
+        <field name="property_id" ref="demo_prop_palm"/>
+        <field name="guest_name">Diego Morales</field>
+        <field name="check_in" eval="(DateTime.today() + relativedelta(days=2)).strftime('%Y-%m-%d')"/>
+        <field name="check_out" eval="(DateTime.today() + relativedelta(days=6)).strftime('%Y-%m-%d')"/>
+        <field name="total_amount">720</field>
+    </record>
+
+    <!-- Tasks -->
+    <record id="demo_task_turnover_sunset" model="sukoon.task">
+        <field name="name">Turnover clean before the Okafor check-in</field>
+        <field name="property_id" ref="demo_prop_sunset"/>
+        <field name="reservation_id" ref="demo_res_sunset_now"/>
+        <field name="task_type">cleaning</field>
+        <field name="due_date" eval="(DateTime.today() + relativedelta(days=3)).strftime('%Y-%m-%d')"/>
+        <field name="assignee">Maria G.</field>
+    </record>
+    <record id="demo_task_restock_harbor" model="sukoon.task">
+        <field name="name">Restock coffee, towels and toiletries</field>
+        <field name="property_id" ref="demo_prop_harbor"/>
+        <field name="task_type">restock</field>
+        <field name="due_date" eval="(DateTime.today() + relativedelta(days=1)).strftime('%Y-%m-%d')"/>
+        <field name="assignee">Maria G.</field>
+    </record>
+    <record id="demo_task_ac_palm" model="sukoon.task">
+        <field name="name">AC not cooling - service visit</field>
+        <field name="property_id" ref="demo_prop_palm"/>
+        <field name="task_type">maintenance</field>
+        <field name="due_date" eval="(DateTime.today() - relativedelta(days=1)).strftime('%Y-%m-%d')"/>
+        <field name="assignee">CoolAir HVAC</field>
+        <field name="state">in_progress</field>
+    </record>
+    <record id="demo_task_inspect_sunset" model="sukoon.task">
+        <field name="name">Post-stay inspection</field>
+        <field name="property_id" ref="demo_prop_sunset"/>
+        <field name="task_type">inspection</field>
+        <field name="due_date" eval="(DateTime.today() - relativedelta(days=8)).strftime('%Y-%m-%d')"/>
+        <field name="assignee">Dana W.</field>
+        <field name="state">done</field>
+    </record>
+
+    <!-- Expenses -->
+    <record id="demo_exp_plumber" model="sukoon.expense">
+        <field name="name">Plumber - kitchen sink</field>
+        <field name="property_id" ref="demo_prop_sunset"/>
+        <field name="amount">180</field>
+        <field name="date" eval="(DateTime.today() - relativedelta(days=3)).strftime('%Y-%m-%d')"/>
+        <field name="category">maintenance</field>
+    </record>
+    <record id="demo_exp_supplies" model="sukoon.expense">
+        <field name="name">Cleaning supplies</field>
+        <field name="property_id" ref="demo_prop_harbor"/>
+        <field name="amount">45</field>
+        <field name="date" eval="(DateTime.today() - relativedelta(days=1)).strftime('%Y-%m-%d')"/>
+        <field name="category">supplies</field>
+    </record>
+    <record id="demo_exp_power" model="sukoon.expense">
+        <field name="name">Electricity bill</field>
+        <field name="property_id" ref="demo_prop_palm"/>
+        <field name="amount">95</field>
+        <field name="date" eval="DateTime.today().strftime('%Y-%m-%d')"/>
+        <field name="category">utilities</field>
+    </record>
+</odoo>

@@ -1,0 +1,21 @@
+// Sukoon theme for the whole Odoo backend.
+//
+// Odoo declares its colours with `!default`, so any value set here (this
+// file is prepended before Odoo's own variables) wins. Change a colour,
+// then restart the server and hard-refresh the browser (Ctrl+Shift+R).
+
+// Top bar (navbar) and other "brand" surfaces.
+$o-brand-odoo: #3E2C1C;          // deep walnut brown
+
+// Buttons, links, active tabs, checkboxes, the "New" button, etc.
+$o-brand-primary: #7C5E28;       // deep brass (white text stays readable)
+$o-action: $o-brand-primary;
+
+// Page background behind lists, forms and kanban cards.
+$o-webclient-background-color: #FAF7F1;   // warm paper
+
+// Status colours (badges, alerts, kanban ribbons). Odoo defaults shown.
+// $o-success: #28a745;
+// $o-info: #17a2b8;
+// $o-warning: #ffac00;
+// $o-danger: #dc3545;

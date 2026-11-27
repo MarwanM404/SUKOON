@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sukoon_reservation_list" model="ir.ui.view">
+        <field name="name">sukoon.reservation.list</field>
+        <field name="model">sukoon.reservation</field>
+        <field name="arch" type="xml">
+            <list string="Reservations"
+                  decoration-muted="state == 'cancelled'"
+                  decoration-bf="state == 'in_stay'">
+                <field name="name" optional="show"/>
+                <field name="guest_name"/>
+                <field name="property_id"/>
+                <field name="owner_id" optional="hide"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="nights" sum="Nights"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="total_amount" sum="Total"/>
+                <field name="commission_amount" optional="hide" sum="Total"/>
+                <field name="owner_payout" sum="Total"/>
+                <field name="state" widget="badge"
+                       decoration-info="state == 'upcoming'"
+                       decoration-warning="state == 'in_stay'"
+                       decoration-success="state == 'completed'"
+                       decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_sukoon_reservation_form" model="ir.ui.view">
+        <field name="name">sukoon.reservation.form</field>
+        <field name="model">sukoon.reservation</field>
+        <field name="arch" type="xml">
+            <form string="Reservation">
+                <header>
+                    <button name="action_check_in" type="object" string="Check In"
+                            class="btn-primary" invisible="state != 'upcoming'"/>
+                    <button name="action_check_out" type="object" string="Check Out"
+                            class="btn-primary" invisible="state != 'in_stay'"/>
+                    <button name="action_cancel" type="object" string="Cancel Booking"
+                            invisible="state not in ('upcoming', 'in_stay')"
+                            confirm="Cancel this booking? The dates become free again."/>
+                    <button name="action_reset_upcoming" type="object" string="Back to Upcoming"
+                            invisible="state not in ('cancelled', 'in_stay')"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="upcoming,in_stay,completed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <div class="text-muted"><field name="name" readonly="1"/></div>
+                        <h1><field name="guest_name" placeholder="Guest name, e.g. Alex Rivera"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="property_id" options="{'no_create': True}"/>
+                            <field name="owner_id" invisible="not owner_id"/>
+                            <label for="check_in" string="Dates"/>
+                            <div class="o_row">
+                                <field name="check_in" widget="daterange"
+                                       options="{'end_date_field': 'check_out'}"/>
+                                <field name="check_out" invisible="1"/>
+                            </div>
+                            <field name="nights"/>
+                        </group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="total_amount"/>
+                            <field name="commission_pct"/>
+                            <field name="commission_amount"/>
+                            <field name="owner_payout" class="fw-bold"/>
+                        </group>
+                    </group>
+                    <field name="notes" placeholder="Late check-in, needs a crib..."/>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sukoon_reservation_calendar" model="ir.ui.view">
+        <field name="name">sukoon.reservation.calendar</field>
+        <field name="model">sukoon.reservation</field>
+        <field name="arch" type="xml">
+            <calendar string="Reservations" date_start="check_in" date_stop="check_out"
+                      color="property_id" mode="month" quick_create="0"
+                      event_open_popup="1">
+                <field name="guest_name"/>
+                <field name="property_id" filters="1"/>
+                <field name="state"/>
+                <field name="nights"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_sukoon_reservation_search" model="ir.ui.view">
+        <field name="name">sukoon.reservation.search</field>
+        <field name="model">sukoon.reservation</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="guest_name"/>
+                <field name="name"/>
+                <field name="property_id"/>
+                <field name="owner_id"/>
+                <filter name="upcoming" string="Upcoming" domain="[('state', '=', 'upcoming')]"/>
+                <filter name="in_stay" string="In stay" domain="[('state', '=', 'in_stay')]"/>
+                <filter name="completed" string="Completed" domain="[('state', '=', 'completed')]"/>
+                <filter name="cancelled" string="Cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <separator/>
+                <filter name="arriving_week" string="Arriving in 7 days"
+                        domain="[('state', '!=', 'cancelled'),
+                                 ('check_in', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('check_in', '&lt;=', (context_today() + relativedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <filter name="departing_week" string="Departing in 7 days"
+                        domain="[('state', '!=', 'cancelled'),
+                                 ('check_out', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('check_out', '&lt;=', (context_today() + relativedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="filter_check_in" string="Check-in" date="check_in"/>
+                <group>
+                    <filter name="group_property" string="Property" context="{'group_by': 'property_id'}"/>
+                    <filter name="group_owner" string="Owner" context="{'group_by': 'owner_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                    <filter name="group_month" string="Check-in Month" context="{'group_by': 'check_in:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_sukoon_reservation" model="ir.actions.act_window">
+        <field name="name">Reservations</field>
+        <field name="res_model">sukoon.reservation</field>
+        <field name="view_mode">list,calendar,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No reservations</p>
+            <p>Add a booking to start tracking payouts.</p>
+        </field>
+    </record>
+</odoo>

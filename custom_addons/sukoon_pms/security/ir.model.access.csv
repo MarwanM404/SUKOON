@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sukoon_property_user,sukoon.property user,model_sukoon_property,group_sukoon_user,1,0,0,0
+access_sukoon_property_manager,sukoon.property manager,model_sukoon_property,group_sukoon_manager,1,1,1,1
+access_sukoon_reservation_user,sukoon.reservation user,model_sukoon_reservation,group_sukoon_user,1,1,1,1
+access_sukoon_task_user,sukoon.task user,model_sukoon_task,group_sukoon_user,1,1,1,1
+access_sukoon_expense_user,sukoon.expense user,model_sukoon_expense,group_sukoon_user,1,1,1,0
+access_sukoon_expense_manager,sukoon.expense manager,model_sukoon_expense,group_sukoon_manager,1,1,1,1
+access_sukoon_owner_statement_manager,sukoon.owner.statement manager,model_sukoon_owner_statement,group_sukoon_manager,1,1,1,1

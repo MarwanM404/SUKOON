@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="sukoon_pms.DashboardList">
+        <div t-if="!list_items.length" class="o_sukoon_empty" t-esc="list_empty"/>
+        <div t-else="" class="list-group list-group-flush">
+            <button t-foreach="list_items" t-as="item" t-key="item.id" type="button"
+                    class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                    t-on-click="() => this.openRecord(list_model, item.id)">
+                <div class="text-start">
+                    <div class="fw-semibold" t-esc="item.title"/>
+                    <div class="small text-muted" t-esc="item.sub"/>
+                </div>
+                <span t-attf-class="badge rounded-pill {{ this.pillClass(item.state) }}" t-esc="item.state_label"/>
+            </button>
+        </div>
+    </t>
+
+    <t t-name="sukoon_pms.Dashboard">
+        <div class="o_action o_sukoon_dashboard h-100 overflow-auto">
+            <div t-if="state.data" class="container-fluid px-4 py-4">
+                <t t-set="d" t-value="state.data"/>
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+                    <div>
+                        <h2 class="mb-0">Dashboard</h2>
+                        <div class="text-muted">Today's snapshot across every property</div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary" t-on-click="() => this.newRecord('sukoon.reservation')">
+                            <i class="fa fa-plus me-1"/>Reservation
+                        </button>
+                        <button class="btn btn-secondary" t-on-click="() => this.newRecord('sukoon.task')">
+                            <i class="fa fa-plus me-1"/>Task
+                        </button>
+                        <button class="btn btn-secondary" t-on-click="() => this.load()" title="Refresh">
+                            <i class="fa fa-refresh"/>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="o_sukoon_kpis mb-4">
+                    <button class="o_sukoon_kpi" t-on-click="openProperties">
+                        <span class="o_sukoon_kpi_label">Active properties</span>
+                        <span class="o_sukoon_kpi_value" t-esc="d.kpis.active_properties"/>
+                    </button>
+                    <button class="o_sukoon_kpi" t-on-click="openArrivals">
+                        <span class="o_sukoon_kpi_label">Check-ins, next 7 days</span>
+                        <span class="o_sukoon_kpi_value o_sukoon_accent" t-esc="d.kpis.arrivals"/>
+                    </button>
+                    <button class="o_sukoon_kpi" t-on-click="openDepartures">
+                        <span class="o_sukoon_kpi_label">Check-outs, next 7 days</span>
+                        <span class="o_sukoon_kpi_value o_sukoon_accent" t-esc="d.kpis.departures"/>
+                    </button>
+                    <button class="o_sukoon_kpi" t-on-click="openOpenTasks">
+                        <span class="o_sukoon_kpi_label">Open tasks</span>
+                        <span class="o_sukoon_kpi_value" t-esc="d.kpis.open_tasks"/>
+                    </button>
+                    <button class="o_sukoon_kpi" t-on-click="openMonth">
+                        <span class="o_sukoon_kpi_label">This month's revenue</span>
+                        <span class="o_sukoon_kpi_value o_sukoon_money" t-esc="d.kpis.revenue"/>
+                    </button>
+                    <button class="o_sukoon_kpi" t-on-click="openMonth">
+                        <span class="o_sukoon_kpi_label">Owed to owners</span>
+                        <span class="o_sukoon_kpi_value" t-esc="d.kpis.owed_to_owners"/>
+                    </button>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-lg-6 d-flex flex-column gap-4">
+                        <section class="card o_sukoon_block">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Upcoming check-ins</h5>
+                                <a href="#" class="small" t-on-click.prevent="openArrivals"><t t-esc="d.kpis.arrivals"/> in the next week</a>
+                            </div>
+                            <t t-call="sukoon_pms.DashboardList">
+                                <t t-set="list_items" t-value="d.arrivals"/>
+                                <t t-set="list_empty">Nothing arriving this week</t>
+                                <t t-set="list_model" t-value="'sukoon.reservation'"/>
+                            </t>
+                        </section>
+                        <section class="card o_sukoon_block">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Upcoming check-outs</h5>
+                                <a href="#" class="small" t-on-click.prevent="openDepartures"><t t-esc="d.kpis.departures"/> in the next week</a>
+                            </div>
+                            <t t-call="sukoon_pms.DashboardList">
+                                <t t-set="list_items" t-value="d.departures"/>
+                                <t t-set="list_empty">Nothing departing this week</t>
+                                <t t-set="list_model" t-value="'sukoon.reservation'"/>
+                            </t>
+                        </section>
+                    </div>
+                    <div class="col-lg-6 d-flex flex-column gap-4">
+                        <section class="card o_sukoon_block">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Open tasks</h5>
+                                <a href="#" class="small" t-on-click.prevent="openOpenTasks"><t t-esc="d.kpis.open_tasks"/> pending</a>
+                            </div>
+                            <t t-call="sukoon_pms.DashboardList">
+                                <t t-set="list_items" t-value="d.open_tasks"/>
+                                <t t-set="list_empty">No open tasks - all caught up</t>
+                                <t t-set="list_model" t-value="'sukoon.task'"/>
+                            </t>
+                        </section>
+                        <section class="card o_sukoon_block">
+                            <div class="card-header">
+                                <h5 class="mb-0"><t t-esc="d.month_label"/>, by the numbers</h5>
+                            </div>
+                            <div class="card-body o_sukoon_statement">
+                                <div class="d-flex justify-content-between"><span>Gross booking revenue</span><span t-esc="d.statement.gross"/></div>
+                                <div class="d-flex justify-content-between"><span>Management commission</span><span>- <t t-esc="d.statement.commission"/></span></div>
+                                <div class="d-flex justify-content-between"><span>Property expenses</span><span>- <t t-esc="d.statement.expenses"/></span></div>
+                                <div class="d-flex justify-content-between o_sukoon_total"><span>Owed to owners</span><span t-esc="d.statement.net"/></div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+
+</templates>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_sukoon_owner_statement_form" model="ir.ui.view">
+        <field name="name">sukoon.owner.statement.form</field>
+        <field name="model">sukoon.owner.statement</field>
+        <field name="arch" type="xml">
+            <form string="Owner Statement" create="0">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>Owner Statement</h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="owner_id" options="{'no_create': True}"
+                                   placeholder="Choose an owner..."/>
+                        </group>
+                        <group>
+                            <label for="date_from" string="Period"/>
+                            <div class="o_row">
+                                <field name="date_from" widget="daterange"
+                                       options="{'end_date_field': 'date_to'}"/>
+                                <field name="date_to" invisible="1"/>
+                            </div>
+                        </group>
+                    </group>
+                    <div invisible="owner_id" class="text-muted">
+                        Choose an owner and period to generate a statement.
+                    </div>
+                    <div invisible="not owner_id">
+                        <field name="currency_id" invisible="1"/>
+                        <field name="booking_count" invisible="1"/>
+                        <field name="expense_count" invisible="1"/>
+                        <group class="oe_subtotal_footer" style="float: none; max-width: 420px;">
+                            <field name="gross"/>
+                            <field name="commission" string="- Management Commission"/>
+                            <field name="expense_total" string="- Expenses"/>
+                            <div class="oe_subtotal_footer_separator oe_inline o_td_label">
+                                <label for="net_payout"/>
+                            </div>
+                            <field name="net_payout" nolabel="1" class="oe_subtotal_footer_separator"/>
+                        </group>
+                        <notebook>
+                            <page string="Bookings" name="bookings">
+                                <field name="reservation_ids" readonly="1">
+                                    <list>
+                                        <field name="name"/>
+                                        <field name="guest_name"/>
+                                        <field name="property_id"/>
+                                        <field name="check_in"/>
+                                        <field name="check_out"/>
+                                        <field name="nights"/>
+                                        <field name="currency_id" column_invisible="True"/>
+                                        <field name="total_amount" sum="Total"/>
+                                        <field name="commission_amount" sum="Total"/>
+                                        <field name="owner_payout" sum="Total"/>
+                                    </list>
+                                </field>
+                            </page>
+                            <page string="Expenses" name="expenses">
+                                <field name="expense_ids" readonly="1">
+                                    <list>
+                                        <field name="date"/>
+                                        <field name="name"/>
+                                        <field name="property_id"/>
+                                        <field name="category"/>
+                                        <field name="currency_id" column_invisible="True"/>
+                                        <field name="amount" sum="Total"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_sukoon_owner_statement" model="ir.actions.act_window">
+        <field name="name">Owner Statement</field>
+        <field name="res_model">sukoon.owner.statement</field>
+        <field name="view_mode">form</field>
+        <field name="target">current</field>
+    </record>
+</odoo>

@@ -1,0 +1,71 @@
+// Sukoon brand accents (brass on warm paper), layered on Odoo's own styles.
+$sukoon-brass: #B4914F;
+$sukoon-brass-deep: #7C5E28;
+$sukoon-ochre: #AD7E2E;
+
+.o_sukoon_dashboard {
+    background-color: var(--body-bg, #f9fafb);
+
+    .o_sukoon_kpis {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+    }
+
+    .o_sukoon_kpi {
+        all: unset;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 16px 18px;
+        border-radius: 10px;
+        background: var(--bs-body-bg, #fff);
+        border: 1px solid var(--bs-border-color, #e5e7eb);
+        border-top: 3px solid $sukoon-brass;
+        transition: box-shadow .15s ease, transform .15s ease;
+
+        &:hover, &:focus-visible {
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .08);
+            transform: translateY(-1px);
+        }
+    }
+
+    .o_sukoon_kpi_label {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: var(--bs-secondary-color, #6b7280);
+    }
+
+    .o_sukoon_kpi_value {
+        font-size: 28px;
+        font-weight: 600;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .o_sukoon_accent { color: $sukoon-brass-deep; }
+    .o_sukoon_money { color: $sukoon-ochre; }
+
+    .o_sukoon_block .card-header a { color: $sukoon-brass-deep; }
+
+    .o_sukoon_empty {
+        padding: 24px 16px;
+        text-align: center;
+        color: var(--bs-secondary-color, #6b7280);
+    }
+
+    .o_sukoon_statement {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        font-variant-numeric: tabular-nums;
+
+        .o_sukoon_total {
+            border-top: 1px solid var(--bs-border-color, #e5e7eb);
+            padding-top: 10px;
+            font-weight: 700;
+        }
+    }
+}

@@ -1,0 +1,20 @@
+# Odoo source (cloned separately: git clone --depth 1 -b 19.0 https://github.com/odoo/odoo.git odoo)
+/odoo/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Odoo runtime data (filestore, sessions)
+.odoo_data/
+*.log
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+
+# Local-only secrets
+.local/

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Runs on install and on every upgrade; only fills users whose
+         Home Action is still empty, so manual choices are kept. -->
+    <function model="res.users" name="_sukoon_set_home_action"/>
+</odoo>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_sukoon_root" name="Sukoon"
+              web_icon="sukoon_pms,static/description/icon.png"
+              action="action_sukoon_dashboard"
+              groups="group_sukoon_user" sequence="5"/>
+
+    <menuitem id="menu_sukoon_dashboard" name="Dashboard" parent="menu_sukoon_root"
+              action="action_sukoon_dashboard" sequence="1"/>
+    <menuitem id="menu_sukoon_reservations" name="Reservations" parent="menu_sukoon_root"
+              action="action_sukoon_reservation" sequence="10"/>
+    <menuitem id="menu_sukoon_properties" name="Properties" parent="menu_sukoon_root"
+              action="action_sukoon_property" sequence="20"/>
+    <menuitem id="menu_sukoon_owners" name="Owners" parent="menu_sukoon_root"
+              action="action_sukoon_owner" sequence="30"/>
+    <menuitem id="menu_sukoon_tasks" name="Cleaning &amp; Tasks" parent="menu_sukoon_root"
+              action="action_sukoon_task" sequence="40"/>
+
+    <menuitem id="menu_sukoon_finance" name="Finance" parent="menu_sukoon_root" sequence="50"/>
+    <menuitem id="menu_sukoon_expenses" name="Expenses" parent="menu_sukoon_finance"
+              action="action_sukoon_expense" sequence="10"/>
+    <menuitem id="menu_sukoon_owner_statement" name="Owner Statement" parent="menu_sukoon_finance"
+              action="action_sukoon_owner_statement" sequence="20"
+              groups="group_sukoon_manager"/>
+</odoo>
