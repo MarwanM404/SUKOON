@@ -33,16 +33,13 @@
         <field name="arch" type="xml">
             <form string="Reservation">
                 <header>
-                    <button name="action_check_in" type="object" string="Check In"
-                            class="btn-primary" invisible="state != 'upcoming'"/>
-                    <button name="action_check_out" type="object" string="Check Out"
-                            class="btn-primary" invisible="state != 'in_stay'"/>
+                    <!-- Status follows the dates; only cancelling is manual. -->
                     <button name="action_cancel" type="object" string="Cancel Booking"
                             invisible="state not in ('upcoming', 'in_stay')"
                             confirm="Cancel this booking? The dates become free again."/>
-                    <button name="action_reset_upcoming" type="object" string="Back to Upcoming"
-                            invisible="state not in ('cancelled', 'in_stay')"/>
-                    <field name="state" widget="statusbar"
+                    <button name="action_reopen" type="object" string="Reopen Booking"
+                            invisible="state != 'cancelled'"/>
+                    <field name="state" widget="statusbar" readonly="1"
                            statusbar_visible="upcoming,in_stay,completed"/>
                 </header>
                 <sheet>

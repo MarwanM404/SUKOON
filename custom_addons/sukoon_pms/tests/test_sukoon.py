@@ -1,5 +1,7 @@
 from datetime import date
 
+from freezegun import freeze_time
+
 from odoo.exceptions import UserError, ValidationError
 from odoo.tests import TransactionCase, tagged
 
@@ -60,25 +62,65 @@ class TestSukoon(TransactionCase):
         # Another property is unaffected.
         self._res(date(2026, 4, 2), date(2026, 4, 4), prop=self.other_prop)
 
+    @freeze_time('2026-04-20')
     def test_cancelled_bookings_free_the_dates(self):
         first = self._res(date(2026, 5, 1), date(2026, 5, 5))
         first.action_cancel()
         self._res(date(2026, 5, 2), date(2026, 5, 4))
         # Reopening the cancelled one would now clash.
         with self.assertRaises(ValidationError):
-            first.action_reset_upcoming()
+            first.action_reopen()
 
-    def test_status_flow(self):
-        res = self._res(date(2026, 6, 1), date(2026, 6, 3))
-        self.assertEqual(res.state, 'upcoming')
-        with self.assertRaises(UserError):
-            res.action_check_out()
-        res.action_check_in()
-        self.assertEqual(res.state, 'in_stay')
-        res.action_check_out()
-        self.assertEqual(res.state, 'completed')
-        with self.assertRaises(UserError):
+    @freeze_time('2026-06-10')
+    def test_state_follows_dates(self):
+        past = self._res(date(2026, 6, 1), date(2026, 6, 3))
+        now = self._res(date(2026, 6, 9), date(2026, 6, 12))
+        arriving_today = self._res(date(2026, 6, 10), date(2026, 6, 11), prop=self.other_prop)
+        future = self._res(date(2026, 6, 20), date(2026, 6, 22))
+        leaving_today = self._res(date(2026, 6, 5), date(2026, 6, 9), prop=self.other_prop)
+        self.assertEqual(past.state, 'completed')
+        self.assertEqual(now.state, 'in_stay')
+        self.assertEqual(arriving_today.state, 'in_stay', 'In stay from the check-in day')
+        self.assertEqual(future.state, 'upcoming')
+        self.assertEqual(leaving_today.state, 'completed')
+
+        # Editing the dates updates the status straight away.
+        arriving_today.write({'check_in': date(2026, 6, 11), 'check_out': date(2026, 6, 13)})
+        self.assertEqual(arriving_today.state, 'upcoming')
+        past.check_out = date(2026, 6, 4)
+        self.assertEqual(past.state, 'completed')
+        leaving_today.check_out = date(2026, 6, 10)
+        self.assertEqual(leaving_today.state, 'completed')
+        leaving_today.check_out = date(2026, 6, 11)
+        self.assertEqual(leaving_today.state, 'in_stay', 'Extending a stay reopens it')
+
+    def test_cron_moves_bookings_as_days_pass(self):
+        with freeze_time('2026-06-01'):
+            res = self._res(date(2026, 6, 3), date(2026, 6, 5))
+            cancelled = self._res(date(2026, 6, 3), date(2026, 6, 5), prop=self.other_prop)
+            cancelled.action_cancel()
+            self.assertEqual(res.state, 'upcoming')
+        Res = self.env['sukoon.reservation']
+        with freeze_time('2026-06-03'):
+            Res._cron_update_states()
+            self.assertEqual(res.state, 'in_stay')
+        with freeze_time('2026-06-05'):
+            Res._cron_update_states()
+            self.assertEqual(res.state, 'completed')
+            self.assertEqual(cancelled.state, 'cancelled', 'Cancelled bookings never move')
+
+    def test_cancel_and_reopen(self):
+        with freeze_time('2026-06-10'):
+            res = self._res(date(2026, 6, 9), date(2026, 6, 12))
             res.action_cancel()
+            self.assertEqual(res.state, 'cancelled')
+            res.action_reopen()
+            self.assertEqual(res.state, 'in_stay', 'Reopening goes back to what the dates say')
+            done = self._res(date(2026, 6, 1), date(2026, 6, 3))
+            with self.assertRaises(UserError):
+                done.action_cancel()
+            with self.assertRaises(UserError):
+                res.action_reopen()
 
     def test_owner_statement(self):
         self._res(date(2026, 7, 2), date(2026, 7, 6), total_amount=1000)       # counts

@@ -40,14 +40,35 @@ class SukoonReservation(models.Model):
          ('in_stay', 'In stay'),
          ('completed', 'Completed'),
          ('cancelled', 'Cancelled')],
-        string='Status', default='upcoming', required=True, tracking=True,
-        group_expand=True)
+        string='Status', compute='_compute_state', store=True, readonly=False,
+        precompute=True, required=True, tracking=True, index=True,
+        group_expand=True,
+        help="Follows the dates: Upcoming before check-in, In stay from the "
+             "check-in day, Completed from the check-out day. Only Cancelled "
+             "is set by hand.")
     notes = fields.Text()
 
     # ------------------------------------------------------------------
     # Computes and constraints
     # ------------------------------------------------------------------
-    # TODO link states to reservation date
+
+    def _state_for_dates(self, today):
+        """The status the dates call for on `today` (ignores cancellation)."""
+        self.ensure_one()
+        if not self.check_in or today < self.check_in:
+            return 'upcoming'
+        if self.check_out and today >= self.check_out:
+            return 'completed'
+        return 'in_stay'
+
+    @api.depends('check_in', 'check_out')
+    def _compute_state(self):
+        # Runs when the dates change; the daily cron handles the passing of
+        # time. A cancelled booking stays cancelled until it is reopened.
+        today = fields.Date.context_today(self)
+        for res in self:
+            res.state = ('cancelled' if res.state == 'cancelled'
+                         else res._state_for_dates(today))
 
     @api.depends('guest_name', 'name')
     def _compute_display_name(self):
@@ -112,29 +133,44 @@ class SukoonReservation(models.Model):
         return super().create(vals_list)
 
     # ------------------------------------------------------------------
-    # Status buttons
+    # Status: cancel / reopen by hand, everything else from the dates
     # ------------------------------------------------------------------
 
-    def _move(self, allowed, target):
+    def _check_state_in(self, allowed):
         for res in self:
             if res.state not in allowed:
                 raise UserError(self.env._(
-                    '%(ref)s is %(state)s and cannot be moved to that status.',
+                    '%(ref)s is %(state)s and cannot be changed that way.',
                     ref=res.name,
                     state=dict(self._fields['state'].selection)[res.state]))
-        self.write({'state': target})
-
-    def action_check_in(self):
-        self._move(['upcoming'], 'in_stay')
-
-    def action_check_out(self):
-        self._move(['in_stay'], 'completed')
 
     def action_cancel(self):
-        self._move(['upcoming', 'in_stay'], 'cancelled')
+        self._check_state_in(['upcoming', 'in_stay'])
+        self.write({'state': 'cancelled'})
 
-    def action_reset_upcoming(self):
-        self._move(['cancelled', 'in_stay'], 'upcoming')
+    def action_reopen(self):
+        """Undo a cancellation; the status goes back to what the dates say."""
+        self._check_state_in(['cancelled'])
+        today = fields.Date.context_today(self)
+        for res in self:
+            res.state = res._state_for_dates(today)
+
+    @api.model
+    def _cron_update_states(self):
+        """Daily: move bookings along as their check-in/check-out days arrive.
+
+        Also run on every module install/upgrade, so a server that was off
+        overnight catches up straight away.
+        """
+        today = fields.Date.context_today(self)
+        moves = {}
+        for res in self.search([('state', 'in', ('upcoming', 'in_stay'))]):
+            new_state = res._state_for_dates(today)
+            if new_state != res.state:
+                moves.setdefault(new_state, self.browse())
+                moves[new_state] |= res
+        for new_state, records in moves.items():
+            records.write({'state': new_state})
 
     # ------------------------------------------------------------------
     # Dashboard

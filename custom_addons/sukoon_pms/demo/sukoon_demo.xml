@@ -52,7 +52,6 @@
         <field name="check_in" eval="(DateTime.today() - relativedelta(days=12)).strftime('%Y-%m-%d')"/>
         <field name="check_out" eval="(DateTime.today() - relativedelta(days=8)).strftime('%Y-%m-%d')"/>
         <field name="total_amount">1000</field>
-        <field name="state">completed</field>
     </record>
     <record id="demo_res_sunset_now" model="sukoon.reservation">
         <field name="property_id" ref="demo_prop_sunset"/>
@@ -60,7 +59,6 @@
         <field name="check_in" eval="(DateTime.today() - relativedelta(days=2)).strftime('%Y-%m-%d')"/>
         <field name="check_out" eval="(DateTime.today() + relativedelta(days=3)).strftime('%Y-%m-%d')"/>
         <field name="total_amount">1250</field>
-        <field name="state">in_stay</field>
         <field name="notes">Late check-in, needs a crib.</field>
     </record>
     <record id="demo_res_sunset_next" model="sukoon.reservation">
@@ -76,7 +74,6 @@
         <field name="check_in" eval="(DateTime.today() - relativedelta(days=6)).strftime('%Y-%m-%d')"/>
         <field name="check_out" eval="(DateTime.today() - relativedelta(days=3)).strftime('%Y-%m-%d')"/>
         <field name="total_amount">420</field>
-        <field name="state">completed</field>
     </record>
     <record id="demo_res_harbor_next" model="sukoon.reservation">
         <field name="property_id" ref="demo_prop_harbor"/>
@@ -99,7 +96,6 @@
         <field name="check_in" eval="(DateTime.today() - relativedelta(days=1)).strftime('%Y-%m-%d')"/>
         <field name="check_out" eval="(DateTime.today() + relativedelta(days=2)).strftime('%Y-%m-%d')"/>
         <field name="total_amount">540</field>
-        <field name="state">in_stay</field>
     </record>
     <record id="demo_res_palm_next" model="sukoon.reservation">
         <field name="property_id" ref="demo_prop_palm"/>

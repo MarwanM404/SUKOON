@@ -18,12 +18,13 @@ short-term rental units on behalf of their owners.
 * A dashboard with this week's arrivals, departures, open tasks and
   this month's numbers
 """,
-    'author': 'Sukoon',
+    'author': 'Marwan Morad',
     'depends': ['base', 'mail', 'web'],
     'data': [
         'security/sukoon_security.xml',
         'security/ir.model.access.csv',
         'data/sukoon_sequence.xml',
+        'data/sukoon_cron.xml',
         'views/sukoon_property_views.xml',
         'views/sukoon_owner_views.xml',
         'views/sukoon_reservation_views.xml',
