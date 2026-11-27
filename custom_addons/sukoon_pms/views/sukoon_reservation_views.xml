@@ -35,6 +35,7 @@
                 <header>
                     <!-- Status follows the dates; only cancelling is manual. -->
                     <button name="action_cancel" type="object" string="Cancel Booking"
+                            class="btn-danger"
                             invisible="state not in ('upcoming', 'in_stay')"
                             confirm="Cancel this booking? The dates become free again."/>
                     <button name="action_reopen" type="object" string="Reopen Booking"
